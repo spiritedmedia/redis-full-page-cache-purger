@@ -64,7 +64,7 @@ class Predis_Purger {
 	 * Delete a single key from Redis
 	 * e.g. $key can be nginx-cache:httpGETexample.com/
 	 *
-	 * @param string $key Cache key to be deleted
+	 * @param string $key Cache key to be deleted.
 	 */
 	public function delete_single_key( $key ) {
 		try {
@@ -84,7 +84,7 @@ class Predis_Purger {
 	 *
 	 * Call redis eval and return value from lua script
 	 *
-	 * @param string $pattern Cache key pattern
+	 * @param string $pattern Cache key pattern.
 	 */
 	public function delete_keys_by_wildcard( $pattern ) {
 

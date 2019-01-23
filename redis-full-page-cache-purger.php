@@ -4,10 +4,11 @@
  * Plugin URI:        https://github.com/kingkool68
  * Description:       Purges keys from Redis when certain WordPress events happen. Pairs well with EasyEngine.
  * Version:           0.0.1
- * Author:            Russell Heimlich
- * Author URI:        https://russellheimlich.com
+ * Author:            Russell Heimlich, Chris Montgomery
  * Requires at least: 3.0
  * Tested up to: 4.9.8
+ *
+ * @package Redis Full Page Cache Purger
  */
 
 // If this file is called directly, abort.

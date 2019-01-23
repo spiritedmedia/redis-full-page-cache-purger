@@ -1,5 +1,9 @@
 <?php
 
+
+/**
+ * Purge Redis keys after certain WordPress events.
+ */
 class Redis_Full_Page_Cache_Purger {
 
 	/**
@@ -43,9 +47,9 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Handle purging a post when a comment is transitioned
 	 *
-	 * @param  string     $new_status New comment status
-	 * @param  string     $old_status Old comment status
-	 * @param  WP_Comment $comment    The comment object being modified
+	 * @param  string     $new_status New comment status.
+	 * @param  string     $old_status Old comment status.
+	 * @param  WP_Comment $comment    The comment object being modified.
 	 */
 	public function action_transition_comment_status( $new_status = '', $old_status = '', $comment ) {
 		if ( ! empty( $comment->$comment_post_ID ) ) {
@@ -59,8 +63,8 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Purge URLs when a term is modified
 	 *
-	 * @param  integer $term_id       ID of the term being modified
-	 * @param  string  $taxonomy_slug Taxonomy of the term being modified
+	 * @param  integer $term_id       ID of the term being modified.
+	 * @param  string  $taxonomy_slug Taxonomy of the term being modified.
 	 */
 	public function action_edit_terms( $term_id = 0, $taxonomy_slug = '' ) {
 		$taxonomy = get_taxonomy( $taxonomy_slug );
@@ -69,7 +73,7 @@ class Redis_Full_Page_Cache_Purger {
 		}
 
 		// Check if the taxonomy is public,
-		// if not there is nothing to purge from cache
+		// if not there is nothing to purge from cache.
 		if ( empty( $taxonomy->public ) || ! $taxonomy->public ) {
 			return;
 		}
@@ -103,7 +107,7 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Purge URLs when a user is deleted
 	 *
-	 * @param  integer $user_id ID of the user being deleted
+	 * @param  integer $user_id ID of the user being deleted.
 	 */
 	public function action_delete_user( $user_id = 0 ) {
 		$url = get_author_posts_url( $user_id ) . '*';
@@ -115,12 +119,12 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Purge URLs related to a post
 	 *
-	 * @param  WP_Post $post A post object or post ID
+	 * @param  WP_Post $post A post object or post ID.
 	 */
 	public function purge_post( $post ) {
 		$post = get_post( $post );
 
-		// Don't need to flush post revisions
+		// Don't need to flush post revisions.
 		if ( wp_is_post_revision( $post->ID ) ) {
 			return;
 		}
@@ -129,7 +133,7 @@ class Redis_Full_Page_Cache_Purger {
 		// so we can get a real permalink to flush via http://wordpress.stackexchange.com/a/42988/2744
 		// BAD: http://example.com/?post_type=foo&p=123
 		// GOOD: http://example.com/foo/2015/12/30/a-draft-post/
-		if( in_array( $post->post_status, array( 'draft', 'pending', 'auto-draft', ) ) ) {
+		if ( in_array( $post->post_status, array( 'draft', 'pending', 'auto-draft' ) ) ) {
 			$post->post_status = 'published';
 			$post->post_name = sanitize_title( $post->post_name ? $post->post_name : $post->post_title, $post->ID );
 		}
@@ -145,10 +149,12 @@ class Redis_Full_Page_Cache_Purger {
 		$urls[] = trailingslashit( get_site_url() );
 		$urls[] = trailingslashit( get_site_url() ) . 'page/*';
 
-		// Flush any archives of terms associated with this post
-		$taxonomies = get_taxonomies( array( 'public' => true ) );
+		// Flush any archives of terms associated with this post.
+		$taxonomies = get_taxonomies( array(
+			'public' => true,
+		) );
 		$terms      = wp_get_object_terms( $post->ID, $taxonomies );
-		foreach( $terms as $term ) {
+		foreach ( $terms as $term ) {
 			$term_link = get_term_link( $term );
 			$urls[] = $term_link . '*';
 			$urls[] = $term_link . 'page/*';
@@ -162,14 +168,14 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Handle purging URLs from Redis
 	 *
-	 * @param array|string $urls URLs to be purged
+	 * @param array|string $urls URLs to be purged.
 	 */
 	static public function purge( $urls = array() ) {
-		if( is_string( $urls ) ) {
+		if ( is_string( $urls ) ) {
 			$urls = array( $urls );
 		}
-		foreach( $urls as $url ) {
-			if( filter_var( $url, FILTER_VALIDATE_URL ) === false ) {
+		foreach ( $urls as $url ) {
+			if ( filter_var( $url, FILTER_VALIDATE_URL ) === false ) {
 				continue;
 			}
 			$cache_key = static::get_cache_key( $url );
@@ -200,7 +206,7 @@ class Redis_Full_Page_Cache_Purger {
 	/**
 	 * Get the cache key for a given URL
 	 *
-	 * @param string $url The URL generate a cache key for so it can be purged
+	 * @param string $url The URL generate a cache key for so it can be purged.
 	 * @return string     The cache key
 	 */
 	static public function get_cache_key( $url = '' ) {
@@ -213,6 +219,9 @@ class Redis_Full_Page_Cache_Purger {
 		return apply_filters( 'redis_cache_purge/cache_key', $cache_key, $url, $prefix );
 	}
 
+	/**
+	 * Log messages to the error_log
+	 */
 	static public function log() {
 		if ( ! defined( 'REDIS_CACHE_PURGE_LOGGING' ) || ! REDIS_CACHE_PURGE_LOGGING ) {
 			return;
