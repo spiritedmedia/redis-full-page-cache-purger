@@ -23,6 +23,7 @@ $constants_to_check = array(
 	'REDIS_CACHE_PURGE_PREFIX'          => 'nginx-cache:',
 	'REDIS_CACHE_PURGE_HOST'            => '127.0.0.1',
 	'REDIS_CACHE_PURGE_PORT'            => '6379',
+	'REDIS_CACHE_PURGE_LOGGING'         => false,
 );
 
 foreach ( $constants_to_check as $constant => $default_value ) {

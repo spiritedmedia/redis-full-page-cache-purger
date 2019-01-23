@@ -51,6 +51,7 @@ class Redis_Full_Page_Cache_Purger {
 		if ( ! empty( $comment->$comment_post_ID ) ) {
 			$url = get_permalink( $comment->comment_post_ID ) . '*';
 			$url = apply_filters( 'redis_cache_purge/purge_comment', $url, $comment );
+			static::log( 'Purging comments for post ' . $comment->comment_post_ID );
 			static::purge( $urls );
 		}
 	}
@@ -95,6 +96,7 @@ class Redis_Full_Page_Cache_Purger {
 			}
 		}
 		$urls = apply_filters( 'redis_cache_purge/purge_terms', $urls, $term_id, $taxonomy );
+		static::log( 'Purging terms (' . $term_id . ', ' . $taxonomy_slug . ')' );
 		static::purge( $urls );
 	}
 
@@ -106,6 +108,7 @@ class Redis_Full_Page_Cache_Purger {
 	public function action_delete_user( $user_id = 0 ) {
 		$url = get_author_posts_url( $user_id ) . '*';
 		$url = apply_filters( 'redis_cache_purge/purge_user', $url, $user_id );
+		static::log( 'Purging user (' . $user_id . ')' );
 		static::purge( $url );
 	}
 
@@ -152,6 +155,7 @@ class Redis_Full_Page_Cache_Purger {
 		}
 
 		$urls = apply_filters( 'redis_cache_purge/purge_post', $urls, $post );
+		static::log( 'Purging post (' . $post->ID . ')' );
 		static::purge( $urls );
 	}
 
@@ -169,6 +173,10 @@ class Redis_Full_Page_Cache_Purger {
 				continue;
 			}
 			$cache_key = static::get_cache_key( $url );
+			static::log( array(
+				'url'       => $url,
+				'cache_key' => $cache_key,
+			) );
 			if ( strpos( $cache_key, '*' ) === false ) {
 				do_action( 'redis_cache_purge/purge_single_key', $cache_key );
 			} else {
@@ -203,6 +211,24 @@ class Redis_Full_Page_Cache_Purger {
 		$prefix    = apply_filters( 'redis_cache_purge/cache_prefix', REDIS_CACHE_PURGE_PREFIX );
 		$cache_key = $prefix . $parse['scheme'] . 'GET' . $parse['host'] . $parse['path'];
 		return apply_filters( 'redis_cache_purge/cache_key', $cache_key, $url, $prefix );
+	}
+
+	static public function log() {
+		if ( ! defined( 'REDIS_CACHE_PURGE_LOGGING' ) || ! REDIS_CACHE_PURGE_LOGGING ) {
+			return;
+		}
+		foreach ( func_get_args() as $arg ) {
+			if ( is_array( $arg ) || is_object( $arg ) ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log(
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+					print_r( $arg, true )
+				);
+			} else {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( $arg );
+			}
+		}
 	}
 }
 Redis_Full_Page_Cache_Purger::get_instance();
