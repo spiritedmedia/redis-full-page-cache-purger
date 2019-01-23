@@ -2,7 +2,7 @@
     "name": "spiritedmedia/redis-full-page-cache-purger",
     "description": "Purges keys from Redis when certain WordPress events happen. Pairs well with EasyEngine.",
     "type": "wordpress-plugin",
-    "license": "GPLv3",
+    "license": "GPL-2.0-or-later",
     "authors": [
       {
         "name": "Russell Heimlich",
