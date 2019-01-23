@@ -22,3 +22,4 @@ When certain actions in WordPress happen (update post, edit term etc.) we determ
   - `redis_cache_purge/purge_post` - URLs to be purged when a post is edited. Arguments: `$urls`, `$post`
   - `redis_cache_purge/cache_prefix` - The cache key prefix. Arguments: `REDIS_CACHE_PURGE_PREFIX` (The default cache prefix)
   - `redis_cache_purge/cache_key` - The cache key to purge from Redis. Arguments: `$cache_key`, `$url`, `$prefix`
+  - `redis_cache_purge/purge_all` - URL to be purged when all URLs are requested to be purged. Arguments: `$url`

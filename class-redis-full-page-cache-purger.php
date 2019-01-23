@@ -192,6 +192,15 @@ class Redis_Full_Page_Cache_Purger {
 	}
 
 	/**
+	 * Helper function to easily purge all pages from the full page cache
+	 */
+	static public function purge_all() {
+		$url = trailingslashit( get_site_url() ) . '*';
+		$url = apply_filters( 'redis_cache_purge/purge_all', $url );
+		static::purge( $url );
+	}
+
+	/**
 	 * Get the details for connecting to Redis
 	 *
 	 * @return object Host and port details for connecting to Redis
