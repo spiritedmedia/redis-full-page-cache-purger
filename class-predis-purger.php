@@ -107,3 +107,4 @@ LUA;
 	}
 
 }
+Predis_Purger::get_instance();
