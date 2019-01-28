@@ -155,9 +155,7 @@ class Redis_Full_Page_Cache_Purger {
 		) );
 		$terms      = wp_get_object_terms( $post->ID, $taxonomies );
 		foreach ( $terms as $term ) {
-			$term_link = get_term_link( $term );
-			$urls[] = $term_link . '*';
-			$urls[] = $term_link . 'page/*';
+			$urls[] = get_term_link( $term ) . '*';
 		}
 
 		$urls = apply_filters( 'redis_cache_purge/purge_post', $urls, $post );
