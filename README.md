@@ -2,6 +2,16 @@
 
 Purges keys from Redis when certain WordPress events happen. Pairs well with [EasyEngine](https://easyengine.io/). Based off of the [nginx Helper plugin](https://github.com/rtCamp/nginx-helper). There is no UI. Everything can be configured using constants, actions, and filters.
 
+## Installation
+
+via Composer
+
+```
+composer require spiritedmedia/redis-full-page-cache-purger
+```
+
+or manually download this plugin and place it in your `/wp-content/plugins/` folder
+
 ## How does it work?
 
 When certain actions in WordPress happen (update post, edit term etc.) we determine URLs that need to be flushed and then tell Redis to delete the keys. URLs are transformed into a key that Redis uses to store the full page contents for caching purposes based off of the [Open Resty SRCache nginx module](https://github.com/rtCamp/nginx-helper). Redis purgers can hook into two actions which handle actually talking to Redis and deleting keys.
