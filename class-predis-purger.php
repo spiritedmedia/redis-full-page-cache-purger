@@ -1,7 +1,18 @@
 <?php
+/**
+ * Class file for Predis_Purger
+ *
+ * @category Components
+ * @package WordPress
+ * @subpackage Redis_Full_Page_Cache_Purger
+ * @author Spirited Media <contact@spiritedmedia.com>
+ * @license MIT
+ * @link https://spiritedmedia.com
+ * @since 0.0.1
+ */
 
 /**
- * Handles purging Redis via the 3rd party Predis class
+ * Handle purging Redis via the 3rd party Predis class
  */
 class Predis_Purger {
 
@@ -107,4 +118,5 @@ LUA;
 	}
 
 }
+
 Predis_Purger::get_instance();

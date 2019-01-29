@@ -1,9 +1,20 @@
 <?php
+/**
+ * Class file for PHP_Redis_Purger
+ *
+ * @category Components
+ * @package WordPress
+ * @subpackage Redis_Full_Page_Cache_Purger
+ * @author Spirited Media <contact@spiritedmedia.com>
+ * @license MIT
+ * @link https://spiritedmedia.com
+ * @since 0.0.1
+ */
 
 /**
- * Handles purging Redis via the built-in PHP Redis class
+ * Handle purging Redis via the built-in PHP Redis class
  */
-class Php_Redis_Purger {
+class PHP_Redis_Purger {
 
 	/**
 	 * PHP Redis API object
@@ -103,4 +114,5 @@ LUA;
 	}
 
 }
-Php_Redis_Purger::get_instance();
+
+PHP_Redis_Purger::get_instance();
