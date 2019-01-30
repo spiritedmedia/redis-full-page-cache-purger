@@ -8,7 +8,7 @@
  * Requires at least: 3.0
  * Tested up to: 4.9.8
  *
- * @package Redis Full Page Cache Purger
+ * @package Redis_Full_Page_Cache_Purger
  */
 
 // If this file is called directly, abort.

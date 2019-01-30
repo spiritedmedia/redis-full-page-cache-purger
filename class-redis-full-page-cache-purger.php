@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Class file for Redis_Full_Page_Cache_Purger
+ *
+ * @category Components
+ * @package WordPress
+ * @subpackage Redis_Full_Page_Cache_Purger
+ * @author Spirited Media <contact@spiritedmedia.com>
+ * @license MIT
+ * @link https://spiritedmedia.com
+ * @since 0.0.1
+ */
 
 /**
  * Purge Redis keys after certain WordPress events.
@@ -24,7 +34,7 @@ class Redis_Full_Page_Cache_Purger {
 	 */
 	public function setup() {
 		if ( class_exists( 'Redis' ) ) { // Use PHP5-Redis extension if installed.
-			require_once REDIS_CACHE_PURGE_PLUGIN_DIR_PATH . 'class-phpredis-purger.php';
+			require_once REDIS_CACHE_PURGE_PLUGIN_DIR_PATH . 'class-php-redis-purger.php';
 		} else {
 			require_once REDIS_CACHE_PURGE_PLUGIN_DIR_PATH . 'class-predis-purger.php';
 		}
@@ -34,14 +44,14 @@ class Redis_Full_Page_Cache_Purger {
 	 * Hook into WordPress via actions
 	 */
 	public function setup_actions() {
-		add_action( 'post_updated',              array( $this, 'purge_post' ),                       20, 3 );
-		add_action( 'delete_post',               array( $this, 'purge_post' ),                       20, 2 );
+		add_action( 'post_updated', array( $this, 'purge_post' ), 20, 3 );
+		add_action( 'delete_post', array( $this, 'purge_post' ), 20, 2 );
 		add_action( 'transition_comment_status', array( $this, 'action_transition_comment_status' ), 20, 3 );
 
-		add_action( 'edit_terms',                array( $this, 'action_edit_terms' ),                20, 2 );
-		add_action( 'pre_delete_term',           array( $this, 'action_edit_terms' ),                20, 2 );
+		add_action( 'edit_terms', array( $this, 'action_edit_terms' ), 20, 2 );
+		add_action( 'pre_delete_term', array( $this, 'action_edit_terms' ), 20, 2 );
 
-		add_action( 'delete_user',               array( $this, 'action_delete_user' ),               20, 1 );
+		add_action( 'delete_user', array( $this, 'action_delete_user' ), 20, 1 );
 	}
 
 	/**
@@ -80,7 +90,7 @@ class Redis_Full_Page_Cache_Purger {
 		$urls   = array();
 		$urls[] = get_term_link( $term_id, $taxonomy );
 
-		$query_args = array(
+		$query_args         = array(
 			'post_type'     => 'any',
 			'post_status'   => 'public',
 			'numberposts'   => -1,
@@ -129,13 +139,18 @@ class Redis_Full_Page_Cache_Purger {
 			return;
 		}
 
-		// Rejiggering the $post object if the post is a draft
-		// so we can get a real permalink to flush via http://wordpress.stackexchange.com/a/42988/2744
-		// BAD: http://example.com/?post_type=foo&p=123
-		// GOOD: http://example.com/foo/2015/12/30/a-draft-post/
+		/**
+		 * Rejiggering the $post object if the post is a draft so we can get a
+		 * real permalink to flush
+		 *
+		 * BAD: http://example.com/?post_type=foo&p=123
+		 * GOOD: http://example.com/foo/2015/12/30/a-draft-post/
+		 *
+		 * @link http://wordpress.stackexchange.com/a/42988/2744
+		 */
 		if ( in_array( $post->post_status, array( 'draft', 'pending', 'auto-draft' ) ) ) {
 			$post->post_status = 'published';
-			$post->post_name = sanitize_title( $post->post_name ? $post->post_name : $post->post_title, $post->ID );
+			$post->post_name   = sanitize_title( $post->post_name ? $post->post_name : $post->post_title, $post->ID );
 		}
 
 		$urls   = array();
@@ -150,9 +165,11 @@ class Redis_Full_Page_Cache_Purger {
 		$urls[] = trailingslashit( get_site_url() ) . 'page/*';
 
 		// Flush any archives of terms associated with this post.
-		$taxonomies = get_taxonomies( array(
-			'public' => true,
-		) );
+		$taxonomies = get_taxonomies(
+			array(
+				'public' => true,
+			)
+		);
 		$terms      = wp_get_object_terms( $post->ID, $taxonomies );
 		foreach ( $terms as $term ) {
 			$urls[] = get_term_link( $term ) . '*';
@@ -177,10 +194,12 @@ class Redis_Full_Page_Cache_Purger {
 				continue;
 			}
 			$cache_key = static::get_cache_key( $url );
-			static::log( array(
-				'url'       => $url,
-				'cache_key' => $cache_key,
-			) );
+			static::log(
+				array(
+					'url'       => $url,
+					'cache_key' => $cache_key,
+				)
+			);
 			if ( strpos( $cache_key, '*' ) === false ) {
 				do_action( 'redis_cache_purge/purge_single_key', $cache_key );
 			} else {
@@ -217,7 +236,7 @@ class Redis_Full_Page_Cache_Purger {
 	 * @return string     The cache key
 	 */
 	static public function get_cache_key( $url = '' ) {
-		$parse     = wp_parse_url( $url );
+		$parse = wp_parse_url( $url );
 		if ( empty( $parse['path'] ) ) {
 			$parse['path'] = '';
 		}
