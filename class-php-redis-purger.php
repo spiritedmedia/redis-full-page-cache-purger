@@ -55,7 +55,7 @@ class PHP_Redis_Purger {
 			);
 
 		} catch ( Exception $e ) {
-			erorr_log( $e->getMessage() );
+			error_log( $e->getMessage() );
 		}
 	}
 
